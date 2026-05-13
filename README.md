@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/27709347/README.md)
 # SmartBooks CPA Pricing Calculator
 
 Working MVP for quoting bookkeeping, cleanup, advisory, and monthly accounting services.

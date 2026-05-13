@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartBooks CPA Pricing Calculator</title>
+    <style>
+      :root {
+        --navy-950: #07111f;
+        --navy-900: #0b1729;
+        --navy-850: #10213a;
+        --blue: #2f80ed;
+        --blue-soft: #91c5ff;
+        --text: #eef6ff;
+        --muted: #b9c6d8;
+        --line: rgba(255, 255, 255, 0.11);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top left, rgba(47, 128, 237, 0.2), transparent 34%),
+          linear-gradient(135deg, var(--navy-950), var(--navy-900) 54%, var(--navy-850));
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(1240px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 24px 0 40px;
+      }
+
+      header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 22px;
+        margin-bottom: 24px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--blue-soft);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 0;
+        font-size: clamp(30px, 5vw, 46px);
+        letter-spacing: 0;
+      }
+
+      .tabs,
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        border-radius: 7px;
+        padding: 10px 14px;
+        color: white;
+        font-weight: 800;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid var(--line);
+      }
+
+      .btn.primary,
+      .btn.active {
+        background: var(--blue);
+        border-color: var(--blue);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.22fr) minmax(330px, 0.78fr);
+        gap: 22px;
+      }
+
+      .admin-grid {
+        display: grid;
+        grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr);
+        gap: 22px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.045);
+        box-shadow: 0 24px 80px rgba(2, 12, 27, 0.28);
+        backdrop-filter: blur(10px);
+        padding: 22px;
+      }
+
+      .panel-title {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .panel-title p {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 6px 0 0;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+      }
+
+      label span,
+      .label {
+        color: #cfdbeb;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      input,
+      select {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: rgba(7, 17, 31, 0.82);
+        color: white;
+        padding: 9px 11px;
+        outline: none;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: var(--blue-soft);
+        box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.18);
+      }
+
+      .toggles {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(7, 17, 31, 0.5);
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .toggle input {
+        width: 20px;
+        min-height: 20px;
+        accent-color: var(--blue);
+      }
+
+      .price {
+        font-size: clamp(32px, 5vw, 44px);
+        margin-bottom: 2px;
+      }
+
+      .subtle {
+        color: var(--muted);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 20px 0;
+      }
+
+      .metric,
+      .note,
+      .list li {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(7, 17, 31, 0.54);
+      }
+
+      .metric {
+        padding: 15px;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 24px;
+      }
+
+      .list {
+        display: grid;
+        gap: 9px;
+        padding: 0;
+        margin: 12px 0 0;
+        list-style: none;
+      }
+
+      .list li {
+        padding: 10px 12px;
+        color: #d7e2f1;
+        font-size: 14px;
+      }
+
+      .note {
+        padding: 14px;
+        color: #dce7f5;
+        line-height: 1.55;
+      }
+
+      .explanation {
+        border-color: rgba(145, 197, 255, 0.28);
+        background: rgba(47, 128, 237, 0.12);
+      }
+
+      .section {
+        margin-top: 20px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 13px 12px;
+        text-align: left;
+      }
+
+      th {
+        color: #9fb0c5;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .print-proposal {
+        display: none;
+      }
+
+      @media (max-width: 900px) {
+        header,
+        .grid,
+        .admin-grid {
+          grid-template-columns: 1fr;
+        }
+
+        header {
+          align-items: stretch;
+        }
+
+        .toggles {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        .shell {
+          width: min(100% - 20px, 1240px);
+          padding-top: 14px;
+        }
+
+        .panel {
+          padding: 16px;
+        }
+
+        .form-grid,
+        .toggles,
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .tabs .btn,
+        .actions .btn {
+          flex: 1 1 140px;
+        }
+      }
+
+      @media print {
+        body {
+          background: white;
+          color: #07111f;
+        }
+
+        .shell {
+          display: none;
+        }
+
+        .print-proposal {
+          display: block;
+          padding: 40px;
+          font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        }
+
+        .print-proposal h1 {
+          color: #07111f;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div>
+          <p class="eyebrow">SmartBooks CPA</p>
+          <h1>Bookkeeping Pricing Calculator</h1>
+        </div>
+        <div class="tabs">
+          <button class="btn active" id="calculatorTab">Calculator</button>
+          <button class="btn" id="adminTab">Admin</button>
+        </div>
+      </header>
+
+      <section class="grid" id="calculatorView">
+        <form class="panel" id="intakeForm">
+          <div class="panel-title">
+            <div>
+              <h2>Client Intake</h2>
+              <p>Enter complexity drivers to generate a CPA-reviewed starting quote.</p>
+            </div>
+            <button class="btn primary" type="button" id="saveQuote">Save</button>
+          </div>
+
+          <div class="form-grid" id="fields"></div>
+          <div class="toggles" id="toggles"></div>
+        </form>
+
+        <aside class="panel" id="quoteOutput"></aside>
+      </section>
+
+      <section class="admin-grid hidden" id="adminView">
+        <div class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>Pricing Assumptions</h2>
+              <p>Changes save in this browser for fast quoting.</p>
+            </div>
+          </div>
+          <div class="form-grid" id="pricingFields"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>Saved Quotes</h2>
+              <p>Open prospects or export the quote list.</p>
+            </div>
+            <button class="btn" id="exportCsv">Export CSV</button>
+          </div>
+          <div class="table-wrap" id="quoteTable"></div>
+        </div>
+      </section>
+    </main>
+
+    <section class="print-proposal" id="printProposal"></section>
+
+    <script>
+      const defaultConfig = {
+        tierBase: { Basic: 475, Growth: 650, Advisory: 1000, "Premium CFO": 1500 },
+        setupFee: { base: 350, perAccount: 45, priorityMultiplier: 1.2, whiteGloveMultiplier: 1.4 },
+        cleanupRanges: { none: [0, 0], light: [500, 1500], moderate: [1500, 3500], heavy: [3500, 7500] },
+        hourlyEstimate: { base: 2.5, scoreDivisor: 12 }
+      };
+
+      const blankIntake = {
+        businessName: "",
+        contactName: "",
+        email: "",
+        phone: "",
+        industry: "",
+        entityType: "LLC",
+        monthlyTransactions: 125,
+        bankAccounts: 2,
+        creditCards: 1,
+        payrollNeeded: false,
+        salesTaxNeeded: false,
+        inventory: false,
+        loans: false,
+        multipleOwners: false,
+        booksCondition: "Clean",
+        monthsBehind: 0,
+        monthlyReviewCall: true,
+        taxPlanning: false,
+        advisory: false,
+        responseTime: "Standard"
+      };
+
+      const sampleIntakes = [
+        {
+          ...blankIntake,
+          businessName: "Northstar Therapy Group",
+          contactName: "Maya Patel",
+          email: "maya@northstar.example",
+          phone: "(555) 014-2198",
+          industry: "Healthcare services",
+          entityType: "S-Corp",
+          monthlyTransactions: 180,
+          bankAccounts: 2,
+          creditCards: 2,
+          payrollNeeded: true,
+          loans: true,
+          taxPlanning: true,
+          responseTime: "Priority"
+        },
+        {
+          ...blankIntake,
+          businessName: "Blue Harbor Retail Co.",
+          contactName: "Evan Brooks",
+          email: "evan@blueharbor.example",
+          phone: "(555) 016-8244",
+          industry: "Retail",
+          monthlyTransactions: 520,
+          bankAccounts: 3,
+          creditCards: 4,
+          payrollNeeded: true,
+          salesTaxNeeded: true,
+          inventory: true,
+          booksCondition: "Very messy",
+          monthsBehind: 7,
+          advisory: true,
+          responseTime: "White Glove"
+        },
+        {
+          ...blankIntake,
+          businessName: "Summit Design Studio",
+          contactName: "Claire Nguyen",
+          email: "claire@summit.example",
+          phone: "(555) 019-4310",
+          industry: "Professional services",
+          monthlyTransactions: 70,
+          bankAccounts: 1,
+          creditCards: 1,
+          monthlyReviewCall: false
+        }
+      ];
+
+      const fields = [
+        ["businessName", "Business name", "text"],
+        ["contactName", "Contact name", "text"],
+        ["email", "Email", "email"],
+        ["phone", "Phone", "text"],
+        ["industry", "Industry", "text"],
+        ["entityType", "Entity type", "select", ["Sole Prop", "LLC", "S-Corp", "Partnership", "C-Corp"]],
+        ["monthlyTransactions", "Monthly transaction count", "number"],
+        ["bankAccounts", "Number of bank accounts", "number"],
+        ["creditCards", "Number of credit cards", "number"],
+        ["monthsBehind", "Months behind", "number"],
+        ["booksCondition", "Current books condition", "select", ["Clean", "Somewhat messy", "Very messy", "Failed audit/unreliable"]],
+        ["responseTime", "Desired response time", "select", ["Standard", "Priority", "White Glove"]]
+      ];
+
+      const toggles = [
+        ["payrollNeeded", "Payroll needed?"],
+        ["salesTaxNeeded", "Sales tax needed?"],
+        ["inventory", "Inventory?"],
+        ["loans", "Loans?"],
+        ["multipleOwners", "Multiple owners?"],
+        ["monthlyReviewCall", "Monthly review call?"],
+        ["taxPlanning", "Tax planning needed?"],
+        ["advisory", "Advisory needed?"]
+      ];
+
+      const conditionScores = { Clean: 0, "Somewhat messy": 10, "Very messy": 22, "Failed audit/unreliable": 35 };
+      let intake = { ...blankIntake };
+      let config = JSON.parse(localStorage.getItem("smartbooks-pricing-config-static") || "null") || deepClone(defaultConfig);
+      let quotes = JSON.parse(localStorage.getItem("smartbooks-quotes-static") || "null") || sampleIntakes.map((sample, index) => ({
+        id: `sample-${index + 1}`,
+        intake: sample,
+        result: calculateQuote(sample),
+        createdAt: new Date(Date.now() - index * 86400000).toISOString(),
+        status: "sample"
+      }));
+
+      function calculateQuote(data) {
+        const transactionScore = data.monthlyTransactions <= 100 ? 6 : data.monthlyTransactions <= 250 ? 14 : data.monthlyTransactions <= 500 ? 24 : 34;
+        const accountScore = Math.max(0, data.bankAccounts - 1) * 3 + data.creditCards * 3;
+        const featureScore =
+          score(data.payrollNeeded, 8) +
+          score(data.salesTaxNeeded, 7) +
+          score(data.inventory, 10) +
+          score(data.loans, 5) +
+          score(data.multipleOwners, 6) +
+          score(data.monthlyReviewCall, 5) +
+          score(data.taxPlanning, 8) +
+          score(data.advisory, 14);
+        const entityScore = ["Partnership", "S-Corp", "C-Corp"].includes(data.entityType) ? 6 : data.entityType === "LLC" ? 3 : 0;
+        const responseScore = data.responseTime === "White Glove" ? 12 : data.responseTime === "Priority" ? 7 : 0;
+        const behindScore = Math.min(24, data.monthsBehind * 2);
+        const complexityScore = transactionScore + accountScore + featureScore + entityScore + responseScore + conditionScores[data.booksCondition] + behindScore;
+        const tier = recommendTier(complexityScore, data);
+        const responseMultiplier = data.responseTime === "White Glove" ? 1.18 : data.responseTime === "Priority" ? 1.1 : 1;
+        const monthlyFee = round25(config.tierBase[tier] + Math.max(0, complexityScore - tierFloor(tier)) * 8 * responseMultiplier);
+        const cleanupLevel = cleanupBand(data);
+        const [cleanupFeeLow, cleanupFeeHigh] = config.cleanupRanges[cleanupLevel];
+        const setupMultiplier = data.responseTime === "White Glove" ? config.setupFee.whiteGloveMultiplier : data.responseTime === "Priority" ? config.setupFee.priorityMultiplier : 1;
+        const setupFee = round25((config.setupFee.base + (data.bankAccounts + data.creditCards) * config.setupFee.perAccount) * setupMultiplier);
+        const estimatedMonthlyHours = Math.round((config.hourlyEstimate.base + complexityScore / config.hourlyEstimate.scoreDivisor) * 10) / 10;
+        return {
+          monthlyFee,
+          cleanupFeeLow,
+          cleanupFeeHigh,
+          setupFee,
+          complexityScore,
+          estimatedMonthlyHours,
+          tier,
+          cleanupLevel,
+          included: includedServices(data, tier),
+          internalNotes: internalNotes(data, complexityScore),
+          clientExplanation: `Based on ${data.businessName || "the business"}'s transaction volume, account count, current books condition, and requested support level, SmartBooks CPA recommends the ${tier} monthly service tier. This quote is designed to cover recurring bookkeeping, month-end review, and the added complexity identified in the intake.`
+        };
+      }
+
+      function score(value, points) {
+        return value ? points : 0;
+      }
+
+      function recommendTier(scoreValue, data) {
+        if (data.responseTime === "White Glove" || scoreValue >= 95) return "Premium CFO";
+        if (data.advisory || data.taxPlanning || scoreValue >= 68) return "Advisory";
+        if (scoreValue >= 36 || data.payrollNeeded || data.salesTaxNeeded) return "Growth";
+        return "Basic";
+      }
+
+      function tierFloor(tier) {
+        return tier === "Basic" ? 0 : tier === "Growth" ? 36 : tier === "Advisory" ? 68 : 95;
+      }
+
+      function cleanupBand(data) {
+        if (data.monthsBehind === 0 && data.booksCondition === "Clean") return "none";
+        if (data.booksCondition === "Failed audit/unreliable" || data.monthsBehind >= 10) return "heavy";
+        if (data.booksCondition === "Very messy" || data.monthsBehind >= 5) return "moderate";
+        return "light";
+      }
+
+      function includedServices(data, tier) {
+        const items = ["Monthly bank and credit card reconciliation", "Financial statement preparation", "Month-end review and exception follow-up", "Secure document requests and client communication"];
+        if (data.payrollNeeded) items.push("Payroll coordination and payroll journal entries");
+        if (data.salesTaxNeeded) items.push("Sales tax tracking support");
+        if (data.monthlyReviewCall || tier !== "Basic") items.push("Monthly review call");
+        if (data.taxPlanning || tier === "Advisory" || tier === "Premium CFO") items.push("Tax planning touchpoints");
+        if (data.advisory || tier === "Premium CFO") items.push("Advisory support and KPI review");
+        return items;
+      }
+
+      function internalNotes(data, complexityScore) {
+        const notes = [`Complexity score ${complexityScore}. Confirm transaction volume against bank feeds before final quote.`];
+        if (data.booksCondition !== "Clean") notes.push(`Books condition: ${data.booksCondition}. Review prior-year balance sheet before engagement letter.`);
+        if (data.inventory) notes.push("Inventory adds close complexity; confirm system and count process.");
+        if (data.multipleOwners) notes.push("Multiple owners may require additional equity and distribution review.");
+        if (data.responseTime !== "Standard") notes.push(`${data.responseTime} response time should be reflected in scope and service expectations.`);
+        return notes;
+      }
+
+      function round25(value) {
+        return Math.round(value / 25) * 25;
+      }
+
+      function cleanupText(result) {
+        if (result.cleanupLevel === "none") return "None";
+        return `$${result.cleanupFeeLow.toLocaleString()}-$${result.cleanupFeeHigh.toLocaleString()}${result.cleanupLevel === "heavy" ? "+" : ""}`;
+      }
+
+      function renderFields() {
+        document.getElementById("fields").innerHTML = fields
+          .map(([key, label, type, options]) => {
+            if (type === "select") {
+              return `<label><span>${label}</span><select data-key="${key}">${options.map((option) => `<option ${intake[key] === option ? "selected" : ""}>${option}</option>`).join("")}</select></label>`;
+            }
+            return `<label><span>${label}</span><input data-key="${key}" type="${type}" min="0" value="${escapeHtml(intake[key])}" /></label>`;
+          })
+          .join("");
+
+        document.getElementById("toggles").innerHTML = toggles
+          .map(([key, label]) => `<label class="toggle">${label}<input data-key="${key}" type="checkbox" ${intake[key] ? "checked" : ""} /></label>`)
+          .join("");
+
+        document.querySelectorAll("[data-key]").forEach((input) => {
+          input.addEventListener("input", updateIntake);
+          input.addEventListener("change", updateIntake);
+        });
+      }
+
+      function updateIntake(event) {
+        const key = event.target.dataset.key;
+        if (event.target.type === "checkbox") {
+          intake[key] = event.target.checked;
+        } else if (event.target.type === "number") {
+          intake[key] = Number(event.target.value);
+        } else {
+          intake[key] = event.target.value;
+        }
+        renderQuote();
+      }
+
+      function renderQuote() {
+        const result = calculateQuote(intake);
+        document.getElementById("quoteOutput").innerHTML = `
+          <div class="panel-title">
+            <div>
+              <p class="eyebrow">Recommended Quote</p>
+              <h2 class="price">$${result.monthlyFee.toLocaleString()}/mo</h2>
+              <p class="subtle">${result.tier} service tier</p>
+            </div>
+            <button class="btn" id="proposalPdf">PDF</button>
+          </div>
+          <div class="metrics">
+            ${metric("Complexity", result.complexityScore)}
+            ${metric("Monthly hours", result.estimatedMonthlyHours)}
+            ${metric("Onboarding", `$${result.setupFee.toLocaleString()}`)}
+            ${metric("Cleanup", cleanupText(result))}
+          </div>
+          ${section("What's Included", result.included)}
+          <div class="section">
+            <h3>Client-facing explanation</h3>
+            <p class="note explanation">${result.clientExplanation}</p>
+          </div>
+          ${section("Internal CPA Notes", result.internalNotes)}
+          <p class="note section">Final pricing subject to CPA review. Cleanup scope, catch-up work, and advisory cadence may change after file access and document review.</p>
+        `;
+        document.getElementById("proposalPdf").addEventListener("click", () => printProposal(result));
+      }
+
+      function metric(label, value) {
+        return `<div class="metric"><span class="label">${label}</span><strong>${value}</strong></div>`;
+      }
+
+      function section(title, items) {
+        return `<div class="section"><h3>${title}</h3><ul class="list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>`;
+      }
+
+      function renderPricing() {
+        const pricingFields = [
+          ["tierBase.Basic", "Basic base monthly price"],
+          ["tierBase.Growth", "Growth base monthly price"],
+          ["tierBase.Advisory", "Advisory base monthly price"],
+          ["tierBase.Premium CFO", "Premium CFO base monthly price"],
+          ["setupFee.base", "Base setup fee"],
+          ["setupFee.perAccount", "Setup fee per account/card"],
+          ["cleanupRanges.light.0", "Light cleanup low"],
+          ["cleanupRanges.light.1", "Light cleanup high"],
+          ["cleanupRanges.moderate.0", "Moderate cleanup low"],
+          ["cleanupRanges.moderate.1", "Moderate cleanup high"],
+          ["cleanupRanges.heavy.0", "Heavy cleanup low"],
+          ["cleanupRanges.heavy.1", "Heavy cleanup high"]
+        ];
+        document.getElementById("pricingFields").innerHTML = pricingFields
+          .map(([path, label]) => `<label><span>${label}</span><input type="number" min="0" data-config="${path}" value="${getPath(config, path)}" /></label>`)
+          .join("");
+        document.querySelectorAll("[data-config]").forEach((input) => {
+          input.addEventListener("input", (event) => {
+            setPath(config, event.target.dataset.config, Number(event.target.value));
+            localStorage.setItem("smartbooks-pricing-config-static", JSON.stringify(config));
+            renderQuote();
+            renderTable();
+          });
+        });
+      }
+
+      function renderTable() {
+        document.getElementById("quoteTable").innerHTML = `
+          <table>
+            <thead><tr><th>Prospect</th><th>Contact</th><th>Tier</th><th>Monthly</th><th>Cleanup</th><th>Score</th><th>Action</th></tr></thead>
+            <tbody>
+              ${quotes
+                .map(
+                  (quote) => `<tr>
+                    <td><strong>${escapeHtml(quote.intake.businessName)}</strong></td>
+                    <td>${escapeHtml(quote.intake.contactName)}</td>
+                    <td>${quote.result.tier}</td>
+                    <td>$${quote.result.monthlyFee.toLocaleString()}</td>
+                    <td>${cleanupText(quote.result)}</td>
+                    <td>${quote.result.complexityScore}</td>
+                    <td><button class="btn" data-open="${quote.id}">Open</button></td>
+                  </tr>`
+                )
+                .join("")}
+            </tbody>
+          </table>`;
+        document.querySelectorAll("[data-open]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const quote = quotes.find((item) => item.id === button.dataset.open);
+            intake = { ...quote.intake };
+            renderFields();
+            renderQuote();
+            showCalculator();
+          });
+        });
+      }
+
+      function saveQuote() {
+        const result = calculateQuote(intake);
+        quotes = [{ id: makeId(), intake: { ...intake }, result, createdAt: new Date().toISOString(), status: "draft" }, ...quotes];
+        localStorage.setItem("smartbooks-quotes-static", JSON.stringify(quotes));
+        renderTable();
+      }
+
+      function exportCsv() {
+        const headers = ["Business", "Contact", "Email", "Phone", "Industry", "Tier", "Monthly Fee", "Setup Fee", "Cleanup", "Score", "Hours", "Created"];
+        const rows = quotes.map((quote) => [quote.intake.businessName, quote.intake.contactName, quote.intake.email, quote.intake.phone, quote.intake.industry, quote.result.tier, quote.result.monthlyFee, quote.result.setupFee, cleanupText(quote.result), quote.result.complexityScore, quote.result.estimatedMonthlyHours, quote.createdAt]);
+        const csv = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+        download(new Blob([csv], { type: "text/csv" }), "smartbooks-quotes.csv");
+      }
+
+      function printProposal(result) {
+        document.getElementById("printProposal").innerHTML = `
+          <p style="color:#2f80ed;font-weight:800;letter-spacing:.18em;text-transform:uppercase;">SmartBooks CPA</p>
+          <h1>Bookkeeping & Advisory Proposal</h1>
+          <h2>${escapeHtml(intake.businessName || "Prospective Client")}</h2>
+          <p><strong>Contact:</strong> ${escapeHtml(intake.contactName || "TBD")}</p>
+          <p><strong>Recommended tier:</strong> ${result.tier}</p>
+          <p><strong>Monthly price:</strong> $${result.monthlyFee.toLocaleString()}</p>
+          <p><strong>Setup/onboarding:</strong> $${result.setupFee.toLocaleString()}</p>
+          <p><strong>Cleanup estimate:</strong> ${cleanupText(result)}</p>
+          <h2>Scope of Services</h2>
+          <ul>${result.included.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          <h2>Next Steps</h2>
+          <ol><li>CPA reviews source documents and confirms scope.</li><li>SmartBooks CPA sends final engagement letter.</li><li>Client connects accounting, payroll, and bank access.</li></ol>
+          <p><small>Final pricing subject to CPA review. Proposal estimates may change after file access and document review.</small></p>`;
+        window.print();
+      }
+
+      function download(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = filename;
+        anchor.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function getPath(object, path) {
+        return path.split(".").reduce((value, key) => value[key], object);
+      }
+
+      function setPath(object, path, value) {
+        const keys = path.split(".");
+        const last = keys.pop();
+        const target = keys.reduce((current, key) => current[key], object);
+        target[last] = value;
+      }
+
+      function deepClone(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function makeId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+          return window.crypto.randomUUID();
+        }
+
+        return `quote-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function showCalculator() {
+        document.getElementById("calculatorView").classList.remove("hidden");
+        document.getElementById("adminView").classList.add("hidden");
+        document.getElementById("calculatorTab").classList.add("active");
+        document.getElementById("adminTab").classList.remove("active");
+      }
+
+      function showAdmin() {
+        document.getElementById("calculatorView").classList.add("hidden");
+        document.getElementById("adminView").classList.remove("hidden");
+        document.getElementById("calculatorTab").classList.remove("active");
+        document.getElementById("adminTab").classList.add("active");
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+      }
+
+      document.getElementById("calculatorTab").addEventListener("click", showCalculator);
+      document.getElementById("adminTab").addEventListener("click", showAdmin);
+      document.getElementById("saveQuote").addEventListener("click", saveQuote);
+      document.getElementById("exportCsv").addEventListener("click", exportCsv);
+      renderFields();
+      renderQuote();
+      renderPricing();
+      renderTable();
+    </script>
+  </body>
+</html>
